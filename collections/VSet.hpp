@@ -1,28 +1,52 @@
 #pragma once
+
 #include <cstdint>
+#include <iostream>
+#include <ostream>
 
 #include "../utils/AlignedVector.hpp"
 
-class VSet: AlignedVector<uint32_t> {
+class alignas(32) VSet : public AlignedVector<uint32_t> {
     static constexpr uint32_t empty = 0u;
-    static constexpr float loadFactor = 0.5;
+    static constexpr double loadFactor = 0.5;
 
-public:
-    explicit VSet(const size_t capacity = 256) : AlignedVector<uint32_t>(capacity) {}
-
-    void insert(const uint32_t element) {
-        size_t idx = hash(element) % _capacity;
-        while (_data[idx] != empty) {
-            idx = (idx + 1) % _capacity;
-            // we must find something, because we keep resizing
+    public:
+    explicit VSet(const size_t capacity = 256)
+        : AlignedVector<uint32_t>(capacity)
+        , _size(0)
+    {
+        // Initialize array to empty
+        for (size_t i = 0; i < _capacity; ++i) {
+            _data[i] = empty;
         }
+    }
+
+    void insert(uint32_t element) {
+        size_t idx = hash(element) % _capacity;
+
+        while (_data[idx] != empty) {
+            if (_data[idx] == element) return;
+            idx = (idx + 1) % _capacity;
+        }
+
         _data[idx] = element;
         ++_size;
 
         maybeResize();
     }
 
-private:
+    bool contains(uint32_t element) const {
+        size_t idx = hash(element) % _capacity;
+        while (_data[idx] != empty) {
+            if (_data[idx] == element) return true;
+            idx = (idx + 1) % _capacity;
+        }
+        return false;
+    }
+
+    size_t size() const { return _size; }
+
+    private:
     size_t _size;
 
     static inline uint32_t hash(uint32_t x) {
@@ -35,8 +59,16 @@ private:
     }
 
     void maybeResize() {
-        if (_size / (float)_capacity > loadFactor) {
-            resize(_capacity * 2);
+        if (_capacity == 0) return;
+
+        double load = static_cast<double>(_size) / static_cast<double>(_capacity);
+        if (load > loadFactor) {
+            size_t newCapacity = _capacity * 2;
+            resize(newCapacity);
+
+            for (size_t i = _size; i < _capacity; ++i) {
+                _data[i] = empty;
+            }
         }
     }
 };
