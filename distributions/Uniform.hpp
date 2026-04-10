@@ -30,7 +30,7 @@ public:
     }
 
     void refill() {
-        _rng.clear();
+        _rng.refill();
 
         constexpr double INV = 1.0 / (UINT32_MAX + 2.0);
         size_t j = 0;

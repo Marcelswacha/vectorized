@@ -27,6 +27,6 @@ target_link_libraries(DistributionsTest PRIVATE distributions)
 target_compile_options(DistributionsTest PRIVATE -mavx2)
 
 # Collections benchmark
-#add_executable(VSetBenchmark collections/VSetBench.cpp)
-#target_link_libraries(VSetBenchmark PRIVATE collections)
-#target_compile_options(vectorized PRIVATE -mavx2)
+add_executable(UniformBenchmark distributions/UniformBench.cpp)
+target_link_libraries(UniformBenchmark PRIVATE distributions)
+target_compile_options(UniformBenchmark PRIVATE -mavx2)

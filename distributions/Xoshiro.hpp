@@ -37,7 +37,7 @@ public:
         seed_all(seed_val);
     }
 
-    void clear() {
+    void refill() {
         for (size_t i = 0; i < _capacity; i += 4) {
             __m256i rnd = next_vector();
             _mm256_store_si256(reinterpret_cast<__m256i*>(&_buffer[i]), rnd);
