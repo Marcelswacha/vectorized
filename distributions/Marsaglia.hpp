@@ -2,50 +2,60 @@
 
 #include <cstdint>
 #include <cstdlib>
-#include <cstring>
-#include "Xoshiro.hpp"
+#include <cmath>
+#include <stdexcept>
 
-class VUniformDistribution {
+#include "Uniform.hpp"
+
+class VMarsaglia {
     static constexpr size_t alignment = 32;
 
 public:
-    explicit VUniformDistribution(size_t capacity = 1024)
-        : _samples(nullptr), _idx(0), _capacity(0), _rng(capacity / 2)
+    explicit VMarsaglia(size_t capacity = 1024)
+        : _samples(nullptr),
+          _idx(0),
+          _capacity(0),
+          _uniform(capacity)
     {
         init(capacity);
+        refill();
     }
 
-    ~VUniformDistribution() {
+    ~VMarsaglia() {
         if (_samples) std::free(_samples);
     }
 
-    VUniformDistribution(const VUniformDistribution&) = delete;
-    VUniformDistribution& operator=(const VUniformDistribution&) = delete;
-
-    VUniformDistribution(VUniformDistribution&&) = delete;
-    VUniformDistribution& operator=(VUniformDistribution&&) = delete;
+    VMarsaglia(const VMarsaglia&) = delete;
+    VMarsaglia& operator=(const VMarsaglia&) = delete;
+    VMarsaglia(VMarsaglia&&) = delete;
+    VMarsaglia& operator=(VMarsaglia&&) = delete;
 
     double operator()() {
         if (_idx == _capacity) {
             _idx = 0;
         }
+
         return _samples[_idx++];
     }
 
     void refill() {
-        _rng.refill();
+        _uniform.refill();
 
-        constexpr double INV = 1.0 / (UINT32_MAX + 2.0);
         size_t j = 0;
 
-        for (size_t i = 0; i < _capacity / 2; ++i) {
-            uint64_t x = _rng();
+        while (j < _capacity) {
+            double u, v, s;
 
-            uint32_t lo = static_cast<uint32_t>(x);
-            uint32_t hi = static_cast<uint32_t>(x >> 32);
+            do {
+                u = 2.0 * _uniform() - 1.0;
+                v = 2.0 * _uniform() - 1.0;
+                s = u * u + v * v;
+            } while (s >= 1.0 || s == 0.0);
 
-            _samples[j++] = (lo + 1.0) * INV;
-            _samples[j++] = (hi + 1.0) * INV;
+            const double mul = std::sqrt(-2.0 * std::log(s) / s);
+
+            _samples[j++] = u * mul;
+            _samples[j++] = v * mul;
         }
 
         _idx = 0;
@@ -54,22 +64,22 @@ public:
     void resize(size_t capacity) {
         capacity = roundCapacity(capacity);
 
-        double* oldSamples = _samples;
+        double* old = _samples;
 
         allocate(capacity);
 
-        _rng.resize(capacity / 2);
+        _uniform.resize(capacity);
 
         _idx = 0;
 
-        if (oldSamples) std::free(oldSamples);
+        if (old) std::free(old);
     }
 
     size_t size() const { return _capacity; }
 
 private:
     double* _samples;
-    VXoshiro _rng;
+    VUniformDistribution _uniform;
 
     size_t _idx;
     size_t _capacity;
@@ -78,7 +88,7 @@ private:
         capacity = roundCapacity(capacity);
         allocate(capacity);
 
-        _rng.resize(capacity / 2);
+        _uniform.resize(capacity);
 
         std::memset(_samples, 0, _capacity * sizeof(double));
     }
@@ -96,7 +106,7 @@ private:
     }
 
     static size_t roundCapacity(size_t cap) {
-        cap = (cap + 31) & ~static_cast<size_t>(31);
+        cap = (cap + 31) & ~size_t(31);
         return cap == 0 ? 32 : cap;
     }
 };

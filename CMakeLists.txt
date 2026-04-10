@@ -1,32 +1,51 @@
 cmake_minimum_required(VERSION 4.2)
 project(vectorized)
 
-# Add subdirectories
 add_subdirectory(utils)
 add_subdirectory(collections)
 add_subdirectory(distributions)
 
-# Main executable (optional)
+# -----------------------------------------------------
+# Global compile options (centralized)
+# -----------------------------------------------------
+set(VECTOR_COMPILE_OPTS -mavx2)
+
+# -----------------------------------------------------
+# Helper: test target
+# -----------------------------------------------------
+function(add_vec_test name file)
+    add_executable(${name} ${file})
+    target_link_libraries(${name} PRIVATE collections distributions utils)
+    target_compile_options(${name} PRIVATE ${VECTOR_COMPILE_OPTS})
+endfunction()
+
+# -----------------------------------------------------
+# Helper: benchmark target
+# -----------------------------------------------------
+function(add_vec_bench name file)
+    add_executable(${name} ${file})
+    target_link_libraries(${name} PRIVATE collections distributions utils)
+    target_compile_options(${name} PRIVATE ${VECTOR_COMPILE_OPTS})
+endfunction()
+
+# -----------------------------------------------------
+# Main executable
+# -----------------------------------------------------
 add_executable(vectorized main.cpp)
-target_link_libraries(vectorized PRIVATE collections)
-target_compile_options(vectorized PRIVATE -mavx2)
+target_link_libraries(vectorized PRIVATE collections distributions utils)
+target_compile_options(vectorized PRIVATE ${VECTOR_COMPILE_OPTS})
 
-# Collections tests
-add_executable(VSetTest collections/VSetTest.cpp)
-target_link_libraries(VSetTest PRIVATE collections)
-target_compile_options(VSetTest PRIVATE -mavx2)
+# -----------------------------------------------------
+# Collections
+# -----------------------------------------------------
+add_vec_test(VSetTest collections/VSetTest.cpp)
+add_vec_bench(VSetBenchmark collections/VSetBench.cpp)
 
-# Collections benchmark
-add_executable(VSetBenchmark collections/VSetBench.cpp)
-target_link_libraries(VSetBenchmark PRIVATE collections)
-target_compile_options(VSetBenchmark PRIVATE -mavx2)
+# -----------------------------------------------------
+# Distributions
+# -----------------------------------------------------
+add_vec_test(UniformTest distributions/UniformTest.cpp)
+add_vec_test(MarsagliaTest distributions/MarsagliaTest.cpp)
 
-# Distributions tests
-add_executable(DistributionsTest distributions/UniformTest.cpp)
-target_link_libraries(DistributionsTest PRIVATE distributions)
-target_compile_options(DistributionsTest PRIVATE -mavx2)
-
-# Collections benchmark
-add_executable(UniformBenchmark distributions/UniformBench.cpp)
-target_link_libraries(UniformBenchmark PRIVATE distributions)
-target_compile_options(UniformBenchmark PRIVATE -mavx2)
+add_vec_bench(UniformBenchmark distributions/UniformBench.cpp)
+add_vec_bench(MarsagliaBenchmark distributions/MarsagliaBench.cpp)

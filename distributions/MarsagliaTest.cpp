@@ -1,19 +1,19 @@
 #include "../utils/Testing.hpp"
 #include "../utils/DistributionStats.hpp"
-#include "Uniform.hpp"
+#include "Marsaglia.hpp"
 
 #include <random>
 
 using namespace utils::test;
 using namespace utils::stats;
 
-TEST_GROUP(uniform, full_distribution_match_reference) {
+TEST_GROUP(marsaglia, full_distribution_match_reference) {
     const size_t N = 200000;
 
     std::mt19937_64 rng(123);
-    std::uniform_real_distribution<double> ref_dist(0.0, 1.0);
+    std::normal_distribution<double> ref_dist(0.0, 1.0);
 
-    VUniformDistribution dist(N);
+    VMarsaglia dist(N);
 
     std::vector<double> ref(N), test(N);
 
@@ -34,14 +34,14 @@ TEST_GROUP(uniform, full_distribution_match_reference) {
     ASSERT_CLOSE(ref_stats.variance, test_stats.variance, 1e-2);
     ASSERT_CLOSE(ref_stats.skewness, test_stats.skewness, 1e-1);
 
-    ASSERT_CLOSE(ref_stats.q01, test_stats.q01, 1e-2);
-    ASSERT_CLOSE(ref_stats.q25, test_stats.q25, 1e-2);
-    ASSERT_CLOSE(ref_stats.q50, test_stats.q50, 1e-2);
-    ASSERT_CLOSE(ref_stats.q75, test_stats.q75, 1e-2);
-    ASSERT_CLOSE(ref_stats.q99, test_stats.q99, 1e-2);
+    ASSERT_CLOSE(ref_stats.q01, test_stats.q01, 5e-2);
+    ASSERT_CLOSE(ref_stats.q25, test_stats.q25, 2e-2);
+    ASSERT_CLOSE(ref_stats.q50, test_stats.q50, 2e-2);
+    ASSERT_CLOSE(ref_stats.q75, test_stats.q75, 2e-2);
+    ASSERT_CLOSE(ref_stats.q99, test_stats.q99, 5e-2);
 }
 
 int main() {
-    run_all("uniform");
+    run_all("marsaglia");
     return 0;
 }

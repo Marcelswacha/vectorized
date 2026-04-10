@@ -103,7 +103,7 @@ namespace utils::test {
 #define ASSERT_EQ(a, b) t.assertEqual((a), (b), __FILE__, __LINE__)
 #define ASSERT_TRUE(v)  t.assertTrue((v), __FILE__, __LINE__)
 #define ASSERT_FALSE(v)  t.assertFalse((v), __FILE__, __LINE__)
-#define ASSERT_CLOSE(a, b, tol) t.assertClose((a), (b), (tol), __FILE__, __LINE__)
+#define ASSERT_CLOSE(a, b, __tol) t.assertClose((a), (b), (__tol), __FILE__, __LINE__)
 
     // ---------------------------
     // Runner
