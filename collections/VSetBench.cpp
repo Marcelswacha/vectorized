@@ -99,8 +99,10 @@ BENCH(vset, insert_and_scan) {
     const size_t K = 300;
     auto forbidden = make_dataset(K);
 
+    VSet s (N*2);
+
     BENCH_RUN(bench, [&](size_t x, auto&) {
-        VSet s (K*2);
+        s.clear();
 
         // insert
         for (size_t i = 0; i < K; ++i) {
@@ -122,9 +124,11 @@ BENCH(unordered_set, insert_and_scan) {
     const size_t K = 300;
     auto forbidden = make_dataset(K);
 
+    std::unordered_set<int> s;
+    s.reserve(N * 2);
+
     BENCH_RUN(bench, [&](size_t x, auto&) {
-        std::unordered_set<int> s;
-        s.reserve(K * 2);
+        s.clear();
 
         // insert
         for (size_t i = 0; i < K; ++i) {
