@@ -1,10 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <cstdlib>
 #include <cstring>
-#include <stdexcept>
-#include <algorithm>
 
 class VSet {
     static constexpr uint32_t empty = 0u;
