@@ -6,7 +6,7 @@
 
 #include "../utils/AlignedVector.hpp"
 
-class alignas(32) VSet : public AlignedVector<uint32_t> {
+class VSet : public AlignedVector<uint32_t> {
     static constexpr uint32_t empty = 0u;
     static constexpr double loadFactor = 0.5;
 

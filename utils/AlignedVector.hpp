@@ -1,9 +1,7 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdlib>
 #include <cstring>
-#include <stdexcept>
 
 template <typename T>
 class AlignedVector {
