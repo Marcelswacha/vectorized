@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <vector>
 #include <string>
 #include <functional>
@@ -48,6 +49,24 @@ namespace utils::test {
                 fail("assertTrue failed", file, line);
             }
         }
+
+        void assertClose(double a,
+                  double b,
+                  double tol,
+                  const char* file,
+                  int line) const
+        {
+            double diff = std::fabs(a - b);
+
+            if (diff > tol) {
+                std::ostringstream oss;
+                oss << "ASSERT_CLOSE failed: |"
+                    << a << " - " << b << "| = "
+                    << diff << " > " << tol;
+
+                fail(oss.str().c_str(), file, line);
+            }
+        }
     };
 
     struct Test {
@@ -84,6 +103,7 @@ namespace utils::test {
 #define ASSERT_EQ(a, b) t.assertEqual((a), (b), __FILE__, __LINE__)
 #define ASSERT_TRUE(v)  t.assertTrue((v), __FILE__, __LINE__)
 #define ASSERT_FALSE(v)  t.assertFalse((v), __FILE__, __LINE__)
+#define ASSERT_CLOSE(a, b, tol) t.assertClose((a), (b), (tol), __FILE__, __LINE__)
 
     // ---------------------------
     // Runner
