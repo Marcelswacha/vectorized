@@ -41,6 +41,9 @@ target_compile_options(vectorized PRIVATE ${VECTOR_COMPILE_OPTS})
 add_vec_test(VSetTest collections/VSetTest.cpp)
 add_vec_bench(VSetBenchmark collections/VSetBench.cpp)
 
+add_vec_test(MinHeapTest collections/MinHeapTest.cpp)
+add_vec_bench(MinHeapBenchmark collections/MinHeapBench.cpp)
+
 # -----------------------------------------------------
 # Distributions
 # -----------------------------------------------------
