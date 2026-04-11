@@ -143,10 +143,12 @@ private:
                 double v = 1.0 + c * x;
                 if (v <= 0) continue;
                 v = v * v * v;
+                double x2 = x * x;
+                double x4 = x2 * x2;
 
                 double u = uniform();
-                if (u < 1 - 0.0331 * x * x * x * x) return d * v;
-                if (std::log(u) < 0.5 * x * x + d * (1 - v + std::log(v))) return d * v;
+                if (u < 1 - 0.0331 * x4) return d * v;
+                if (std::log(u) < 0.5 * x2 + d * (1 - v + std::log(v))) return d * v;
         }
     }
 
