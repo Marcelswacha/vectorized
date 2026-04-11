@@ -100,9 +100,6 @@ private:
     }
 
     static size_t roundCapacity(size_t cap) {
-        if (cap < 100000) {
-            cap = 100000;
-        }
         cap = (cap + 31) & ~static_cast<size_t>(31);
         return cap == 0 ? 32 : cap;
     }
