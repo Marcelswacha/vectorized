@@ -42,17 +42,10 @@ public:
             items_.push_back(item);
         }
 
-        std::sort(items_.begin(), items_.end(),
-                  [](const Item& a, const Item& b) {
-                      return (!a.isApprox(threshold) && b.isApprox(threshold));
-            }
-            );
-        // Find the switch point
-        for (border_ = 0; border_ < items_.size(); ++border_) {
-            if (items_[border_].isApprox(threshold)) {
-                break;
-            }
-        }
+        border_ = std::partition(items_.begin(), items_.end(),
+                    [](const Item& i) {
+                        return !i.isApprox(threshold);
+                }) - items_.begin();
 
         // Prepare distributions
         udist_.resize(20000);
