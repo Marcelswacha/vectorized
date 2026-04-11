@@ -15,7 +15,7 @@ public:
         : _samples(nullptr),
           _idx(0),
           _capacity(0),
-          _uniform(capacity)
+          _uniform(capacity, -2.0, 1.0)
     {
         init(capacity);
         refill();
@@ -48,8 +48,8 @@ public:
             double u, v, s;
             do {
 
-                u = 2.0 * _uniform() - 1.0;
-                v = 2.0 * _uniform() - 1.0;
+                u = _uniform();
+                v = _uniform();
                 s = u * u + v * v;
             } while (s >= 1.0 || s == 0.0);
 

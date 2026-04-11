@@ -9,8 +9,8 @@ class VUniformDistribution {
     static constexpr size_t alignment = 32;
 
 public:
-    explicit VUniformDistribution(size_t capacity = 1024)
-        : _samples(nullptr), _idx(0), _capacity(0), _rng(capacity / 2)
+    explicit VUniformDistribution(size_t capacity = 1024, double scale = 1.0, double offset = 0.0)
+        : _samples(nullptr), _idx(0), _capacity(0), _rng(capacity / 2), _scale(scale), _offset(offset)
     {
         init(capacity);
         refill();
@@ -37,7 +37,9 @@ public:
     void refill() {
         _rng.refill();
 
-        constexpr double INV = 1.0 / (UINT32_MAX + 2.0);
+        constexpr double INV32 = 1.0 / 4294967296.0;
+        const double mul = INV32 * _scale;
+
         size_t j = 0;
 
         for (size_t i = 0; i < _capacity / 2; ++i) {
@@ -46,8 +48,8 @@ public:
             uint32_t lo = static_cast<uint32_t>(x);
             uint32_t hi = static_cast<uint32_t>(x >> 32);
 
-            _samples[j++] = (lo + 1.0) * INV;
-            _samples[j++] = (hi + 1.0) * INV;
+            _samples[j++] = (static_cast<double>(lo) * mul) + _offset;
+            _samples[j++] = (static_cast<double>(hi) * mul) + _offset;
         }
 
         _idx = 0;
@@ -77,6 +79,8 @@ private:
 
     size_t _idx;
     size_t _capacity;
+    double _scale;
+    double _offset;
 
     void init(size_t capacity) {
         capacity = roundCapacity(capacity);
