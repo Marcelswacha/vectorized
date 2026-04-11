@@ -55,6 +55,15 @@ public:
         _size = 0;
     }
 
+    void clear(const std::vector<uint32_t>& elements) {
+        std::memset(_data, empty, _capacity * sizeof(uint32_t));
+        _size = 0;
+
+        size_t count = std::min(elements.size(), static_cast<size_t>(_capacity));
+        std::memcpy(_data, elements.data(), count * sizeof(uint32_t));
+        _size = count;
+    }
+
     size_t size() const { return _size; }
 
 private:

@@ -1,30 +1,50 @@
 #include "../utils/Testing.hpp"
 #include "../utils/DistributionStats.hpp"
-#include "Marsaglia.hpp"
+#include "Thompson.hpp"
 
 #include <random>
 
 using namespace utils::test;
 using namespace utils::stats;
 
-TEST_GROUP(marsaglia, full_distribution_match_reference) {
-    const size_t N = 200000;
+template<typename GDistT>
+struct StdBetaDistribution {
+    double operator()(std::mt19937_64 &gen) {
+        double x1 = g1(gen);
+        double x2 = g2(gen);
+
+        return x1 / (x1 + x2);
+    }
+
+    StdBetaDistribution(double successes, double failures) {
+        g1 = GDistT(successes + 1, 1);
+        g2 = GDistT(failures + 1, 1);
+
+    }
+
+    GDistT g1;
+    GDistT g2;
+};
+
+TEST_GROUP(thompson, full_distribution_match_reference) {
+    const size_t N = 20000;
 
     std::mt19937_64 rng(123);
-    std::normal_distribution<double> ref_dist(0.0, 1.0);
-
-    VMarsaglia dist(N);
-
+    StdBetaDistribution<std::gamma_distribution<double>> ref_dist(1, 1);
     std::vector<double> ref(N), test(N);
 
     for (size_t i = 0; i < N; ++i) {
         ref[i] = ref_dist(rng);
     }
 
-    dist.refill();
+    std::vector<Item> items{Item{1, 1}};
+    Thompson11 tom(items);
+    auto f = std::vector<uint32_t>{};
 
     for (size_t i = 0; i < N; ++i) {
-        test[i] = dist();
+        std::cout << i << std::endl;
+        auto r = tom.sample(1, f);
+        test[i] = r[0].score;
     }
 
     auto ref_stats  = compute_stats(ref);
@@ -41,18 +61,7 @@ TEST_GROUP(marsaglia, full_distribution_match_reference) {
     ASSERT_CLOSE(ref_stats.q99, test_stats.q99, 5e-2);
 }
 
-TEST_GROUP(marsaglia, does_not_hang) {
-    VMarsaglia dist(1);
-    double sum = 0.0;
-    const int N = 20000000;
-    for (int i = 0; i < N; ++i) {
-        sum += dist();
-    }
-
-    ASSERT_TRUE(sum < N);
-}
-
 int main() {
-    run_all("marsaglia");
+    run_all("thompson");
     return 0;
 }
