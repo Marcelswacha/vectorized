@@ -30,7 +30,7 @@ static ThompsonBenchData prepare(size_t N, size_t forbiddenNum, size_t topk, Mod
 
     std::uniform_int_distribution<uint32_t> id_dist(1, 1'000'000);
 
-    std::uniform_int_distribution<int> low_dist(0, 10);
+    std::uniform_int_distribution<int> low_dist(0, 8);
     std::uniform_int_distribution<int> high_dist(30, 200);
 
     ThompsonBenchData data;

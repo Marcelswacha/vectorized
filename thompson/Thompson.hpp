@@ -10,15 +10,22 @@
 #include "../collections/MinHeap.hpp"
 #include "../collections/VSet.hpp"
 
-static constexpr int threshold = 20;
-
 struct Item {
     uint32_t id;
     int successes;
     int failures;
 
-    bool isApprox(const int threshold) const {
-        return successes >= threshold && failures >= threshold;
+    bool isApprox(const int threshold = 10 ) const {
+        const double alpha = successes + 1.0;
+        const double beta  = failures + 1.0;
+
+        // Basic size condition
+        if (alpha < threshold || beta < threshold)
+            return false;
+
+        // Optional: check skewness (avoid extreme imbalance)
+        double ratio = alpha / beta;
+        return ratio > 0.1 && ratio < 10.0;
     }
 };
 
@@ -44,7 +51,7 @@ public:
 
         border_ = std::partition(items_.begin(), items_.end(),
                     [](const Item& i) {
-                        return !i.isApprox(threshold);
+                        return !i.isApprox();
                 }) - items_.begin();
 
         prepareDistribution();

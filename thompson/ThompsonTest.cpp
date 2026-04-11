@@ -40,7 +40,9 @@ TEST_GROUP(thompson, full_distribution_match_reference) {
         {100, 100},
         {1000, 1},
         {1, 1000},
-        {1000, 1000}
+        {1000, 1000},
+        {30, 10000},
+        {10000, 30}
     };
 
     for (const auto& [successes, failures] : cases) {
