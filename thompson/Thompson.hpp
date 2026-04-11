@@ -34,7 +34,8 @@ struct IdWithScore {
 class Thompson11 {
 public:
     Thompson11(const std::vector<Item>& items)
-        : set_(items.size()){
+        : set_(items.size())
+    {
         // Copy  items
         items_.reserve(items.size());
         for (const auto& item : items) {
@@ -54,8 +55,6 @@ public:
         }
 
         // Prepare distributions
-        // udist_.resize(border_);
-        // ndist_.resize(items_.size());
         udist_.resize(20000);
         ndist_.resize(20000);
 
@@ -156,7 +155,7 @@ private:
                 v = v * v * v;
 
                 double u = uniform();
-                if (u < 1 - 0.331 * x * x * x * x) return d * v;
+                if (u < 1 - 0.0331 * x * x * x * x) return d * v;
                 if (std::log(u) < 0.5 * x * x + d * (1 - v + std::log(v))) return d * v;
         }
     }

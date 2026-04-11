@@ -28,21 +28,22 @@ struct StdBetaDistribution {
 
 TEST_GROUP(thompson, full_distribution_match_reference) {
     const size_t N = 20000;
+    const auto successes = 1;
+    const auto failures = 1;
 
     std::mt19937_64 rng(123);
-    StdBetaDistribution<std::gamma_distribution<double>> ref_dist(1, 1);
+    StdBetaDistribution<std::gamma_distribution<double>> ref_dist(successes, failures);
     std::vector<double> ref(N), test(N);
 
     for (size_t i = 0; i < N; ++i) {
         ref[i] = ref_dist(rng);
     }
 
-    std::vector<Item> items{Item{1, 1}};
+    std::vector<Item> items{Item{1, successes, failures}};
     Thompson11 tom(items);
     auto f = std::vector<uint32_t>{};
 
     for (size_t i = 0; i < N; ++i) {
-        std::cout << i << std::endl;
         auto r = tom.sample(1, f);
         test[i] = r[0].score;
     }

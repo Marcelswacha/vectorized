@@ -56,3 +56,4 @@ add_vec_bench(MarsagliaBenchmark distributions/MarsagliaBench.cpp)
 
 
 add_vec_test(ThompsonTest thompson/ThompsonTest.cpp)
+add_vec_test(ThompsonBench thompson/ThompsonBench.cpp)

@@ -46,16 +46,11 @@ public:
 
         while (j < _capacity) {
             double u, v, s;
-            int counter = 0;
             do {
 
                 u = 2.0 * _uniform() - 1.0;
                 v = 2.0 * _uniform() - 1.0;
                 s = u * u + v * v;
-                counter++;
-                if (counter > 50) {
-                    std::cout << "HANG " << counter <<std::endl;
-                }
             } while (s >= 1.0 || s == 0.0);
 
             const double mul = std::sqrt(-2.0 * std::log(s) / s);
