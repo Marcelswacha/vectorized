@@ -24,7 +24,7 @@ struct Item {
 
 struct IdWithScore {
     uint32_t id;
-    float score;
+    double score;
 
     bool operator<(const IdWithScore& other) const {
         return score < other.score;
@@ -47,9 +47,7 @@ public:
                         return !i.isApprox(threshold);
                 }) - items_.begin();
 
-        // Prepare distributions
-        udist_.resize(20000);
-        ndist_.resize(20000);
+        prepareDistribution();
 
         precomp_.reserve(items.size());
         for (size_t i = 0; i < items.size(); ++i) {
@@ -78,8 +76,7 @@ public:
     std::vector<IdWithScore> sample(const size_t num, const std::vector<uint32_t>& forbidden) {
         set_.clear(forbidden);
         heap_.clear(num);
-        udist_.refill();
-        ndist_.refill();
+        refill();
 
         size_t i = 0;
 
@@ -158,6 +155,20 @@ private:
         double g2 = sample_gamma(failures + 1.0);
 
         return g1 / (g1 + g2);
+    }
+
+    void prepareDistribution() {
+        if (items_.size() > 32) {
+            udist_.resize(border_);
+            ndist_.resize(items_.size());
+        }
+    }
+
+    void refill() {
+        if (items_.size() > 32) {
+            udist_.refill();
+            ndist_.refill();
+        }
     }
 
 

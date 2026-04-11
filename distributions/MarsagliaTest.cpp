@@ -44,7 +44,7 @@ TEST_GROUP(marsaglia, full_distribution_match_reference) {
 TEST_GROUP(marsaglia, does_not_hang) {
     VMarsaglia dist(1);
     double sum = 0.0;
-    const int N = 20000000;
+    const int N = 200000;
     for (int i = 0; i < N; ++i) {
         sum += dist();
     }

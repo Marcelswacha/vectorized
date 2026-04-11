@@ -74,6 +74,8 @@ public:
         _idx = 0;
 
         if (old) std::free(old);
+
+        refill();
     }
 
     size_t size() const { return _capacity; }

@@ -13,6 +13,7 @@ public:
         : _samples(nullptr), _idx(0), _capacity(0), _rng(capacity / 2)
     {
         init(capacity);
+        refill();
     }
 
     ~VUniformDistribution() {
@@ -64,6 +65,8 @@ public:
         _idx = 0;
 
         if (oldSamples) std::free(oldSamples);
+
+        refill();
     }
 
     size_t size() const { return _capacity; }
