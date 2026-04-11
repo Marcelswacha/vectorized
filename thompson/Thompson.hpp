@@ -15,7 +15,7 @@ struct Item {
     int successes;
     int failures;
 
-    bool isApprox(const int threshold = 10 ) const {
+    bool isApprox(const int threshold = 30 ) const {
         const double alpha = successes + 1.0;
         const double beta  = failures + 1.0;
 
@@ -64,8 +64,10 @@ public:
 
             Precomputed p;
             p.id = item.id;
-            p.successes = item.successes;
-            p.failures = item.failures;
+            p.s_d = (double)item.successes + 1.0 - 1.0 / 3.0;
+            p.s_c= 1.0 / std::sqrt(9.0 * p.s_d);
+            p.f_d = (double)item.failures + 1.0 - 1.0 / 3.0;
+            p.f_c= 1.0 / std::sqrt(9.0 * p.f_d);
 
             if (i < border_) {
                 p.mu = 0.0;
@@ -93,7 +95,7 @@ public:
 
             if (set_.contains(item.id)) continue;
 
-            const double score = sample_beta(item.successes, item.failures);
+            const double score = sample_beta(item);
             heap_.insert({item.id, float(score)});
         }
 
@@ -114,13 +116,14 @@ public:
     }
 
 private:
-    struct alignas(32) Precomputed {
+    struct alignas(64) Precomputed {
         double mu;      // 8 bytes
         double sigma;   // 8 bytes
         uint32_t id;         // 4 bytes
-        int successes;  // 4 bytes
-        int failures;   // 4 bytes
-        char pad[4];    // padding to make 32 bytes
+        double s_d;
+        double s_c;
+        double f_d;
+        double f_c;
     };
 
     std::vector<Item> items_;
@@ -141,10 +144,7 @@ private:
         return udist_();
     }
 
-    double sample_gamma(double alpha) {
-        const double d = alpha - 1.0/3.0;
-        const double c = 1.0 / std::sqrt(9.0 * d);
-
+    double sample_gamma(double d, double c) {
         while (true) {
                 double x = normal(); // standard normal
                 double v = 1.0 + c * x;
@@ -159,9 +159,9 @@ private:
         }
     }
 
-    double sample_beta(double successes, double failures) {
-        double g1 = sample_gamma(successes + 1.0);
-        double g2 = sample_gamma(failures + 1.0);
+    double sample_beta(const Precomputed& p) {
+        double g1 = sample_gamma(p.s_d, p.s_c);
+        double g2 = sample_gamma(p.f_d, p.f_c);
 
         return g1 / (g1 + g2);
     }
