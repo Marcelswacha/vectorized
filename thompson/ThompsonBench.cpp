@@ -31,7 +31,10 @@ static ThompsonBenchData prepare(size_t N, size_t forbiddenNum, size_t topk, Mod
     std::uniform_int_distribution<uint32_t> id_dist(1, 1'000'000);
 
     std::uniform_int_distribution<int> low_dist(0, 8);
-    std::uniform_int_distribution<int> high_dist(30, 200);
+    std::uniform_int_distribution<int> high_dist(100, 200);
+
+    std::uniform_int_distribution<int> real_success(0, 10000);
+    std::uniform_int_distribution<int> real_failure(0, 90000);
 
     ThompsonBenchData data;
     data.items.reserve(N);
@@ -47,17 +50,11 @@ static ThompsonBenchData prepare(size_t N, size_t forbiddenNum, size_t topk, Mod
         else if (mode == Mode::ApproxOnly) {
             // force Gaussian path
             successes = high_dist(rng);
-            failures  = high_dist(rng);
+            failures  = successes + 1;
         }
         else {
-            // realistic mix
-            if (rng() % 2) {
-                successes = low_dist(rng);
-                failures  = low_dist(rng);
-            } else {
-                successes = high_dist(rng);
-                failures  = high_dist(rng);
-            }
+            successes = real_success(rng);
+            failures  = real_failure(rng);
         }
 
         data.items.push_back(Item{

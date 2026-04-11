@@ -15,17 +15,21 @@ struct Item {
     int successes;
     int failures;
 
-    bool isApprox(const int threshold = 30 ) const {
+    bool isApprox(double skew_threshold = 0.1, int min_mass = 30) const {
         const double alpha = successes + 1.0;
         const double beta  = failures + 1.0;
 
-        // Basic size condition
-        if (alpha < threshold || beta < threshold)
+        // ensure enough concentration (normal CLT region)
+        if (alpha < min_mass || beta < min_mass)
             return false;
 
-        // Optional: check skewness (avoid extreme imbalance)
-        double ratio = alpha / beta;
-        return ratio > 0.1 && ratio < 10.0;
+        const double sum = alpha + beta;
+
+        const double skew =
+            (2.0 * (beta - alpha) * std::sqrt(sum + 1.0)) /
+            ((sum + 2.0) * std::sqrt(alpha * beta));
+
+        return std::abs(skew) < skew_threshold;
     }
 };
 
