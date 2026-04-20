@@ -41,6 +41,17 @@ TEST_GROUP(marsaglia, full_distribution_match_reference) {
     ASSERT_CLOSE(ref_stats.q99, test_stats.q99, 5e-2);
 }
 
+TEST_GROUP(marsaglia, does_not_hang) {
+    VMarsaglia dist(1);
+    double sum = 0.0;
+    const int N = 200000;
+    for (int i = 0; i < N; ++i) {
+        sum += dist();
+    }
+
+    ASSERT_TRUE(sum < N);
+}
+
 int main() {
     run_all("marsaglia");
     return 0;

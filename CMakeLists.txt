@@ -4,6 +4,7 @@ project(vectorized)
 add_subdirectory(utils)
 add_subdirectory(collections)
 add_subdirectory(distributions)
+add_subdirectory(thompson)
 
 # -----------------------------------------------------
 # Global compile options (centralized)
@@ -52,3 +53,7 @@ add_vec_test(MarsagliaTest distributions/MarsagliaTest.cpp)
 
 add_vec_bench(UniformBenchmark distributions/UniformBench.cpp)
 add_vec_bench(MarsagliaBenchmark distributions/MarsagliaBench.cpp)
+
+
+add_vec_test(ThompsonTest thompson/ThompsonTest.cpp)
+add_vec_test(ThompsonBench thompson/ThompsonBench.cpp)

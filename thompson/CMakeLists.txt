@@ -1,0 +1,3 @@
+add_library(thompson INTERFACE)
+target_include_directories(thompson INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(thompson INTERFACE utils distributions collections)
